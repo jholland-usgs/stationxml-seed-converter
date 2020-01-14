@@ -1,16 +1,14 @@
 package edu.iris.dmc.station.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
 
 import edu.iris.dmc.IrisUtil;
 import edu.iris.dmc.fdsn.station.model.Channel;
@@ -24,13 +22,9 @@ import edu.iris.dmc.seed.Volume;
 
 public class XmlSeedXmlTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
-
 	@Test
 	public void caseOne() throws Exception {
-		File source = new File(
-				XmlToSeedDocumentConverterTest.class.getClassLoader().getResource("CU_ANWB_BH2.xml").getFile());
+		File source = new File(getClass().getClassLoader().getResource("CU_ANWB_BH2.xml").getFile());
 
 		final FDSNStationXML original = IrisUtil.readXml(source);
 

@@ -37,17 +37,24 @@ public class SeedToXmlFileConverter implements MetadataFileFormatConverter<File>
 
 	}
 
-	public void convert(InputStream source, OutputStream outputStream, Map<String, String> args) throws FileConverterException, IOException {
+	public void convert(InputStream source, OutputStream outputStream, Map<String, String> args)
+			throws FileConverterException, IOException {
 		try {
 			Volume volume = IrisUtil.readSeed(source);
 			FDSNStationXML document = SeedToXmlDocumentConverter.getInstance().convert(volume);
+			if (args != null) {
+				String org = args.get("organization");
+				if (org != null) {
+					document.setSource(org);
+				}
+				String label = args.get("label");
+				if (label != null) {
+					document.setSource(org+" - "+label);
+				}
+			}
 			marshal(document, outputStream);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SeedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (JAXBException | SeedException e) {
+			throw new IOException(e);
 		}
 	}
 
@@ -56,7 +63,7 @@ public class SeedToXmlFileConverter implements MetadataFileFormatConverter<File>
 			throws MetadataConverterException, IOException {
 		try (FileInputStream fileInputStream = new FileInputStream(source);
 				OutputStream fileOutputStream = new FileOutputStream(target)) {
-			convert(fileInputStream, fileOutputStream,args);
+			convert(fileInputStream, fileOutputStream, args);
 		} catch (Exception e) {
 			throw new FileConverterException(e, source.getPath());
 		}

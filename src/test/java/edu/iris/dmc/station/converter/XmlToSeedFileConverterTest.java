@@ -1,12 +1,10 @@
 package edu.iris.dmc.station.converter;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import edu.iris.dmc.IrisUtil;
 import edu.iris.dmc.seed.Volume;
@@ -14,7 +12,6 @@ import edu.iris.dmc.seed.control.dictionary.B031;
 import edu.iris.dmc.seed.control.station.B050;
 import edu.iris.dmc.seed.control.station.B051;
 import edu.iris.dmc.seed.control.station.B059;
-import edu.iris.dmc.station.converter.XmlToSeedFileConverter;
 
 public class XmlToSeedFileConverterTest {
 

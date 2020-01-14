@@ -1,15 +1,14 @@
 package edu.iris.dmc.station.seed;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import edu.iris.dmc.fdsn.station.model.PoleZero;
 import edu.iris.dmc.fdsn.station.model.PolesZeros;
-import edu.iris.dmc.seed.BlocketteFactory;
 import edu.iris.dmc.seed.builder.BlocketteBuilder;
 import edu.iris.dmc.seed.control.station.B053;
 import edu.iris.dmc.seed.control.station.Pole;

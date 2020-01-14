@@ -1,22 +1,18 @@
 package edu.iris.dmc.station.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import edu.iris.dmc.IrisUtil;
-import edu.iris.dmc.fdsn.station.model.Channel;
 import edu.iris.dmc.fdsn.station.model.FDSNStationXML;
-import edu.iris.dmc.fdsn.station.model.Network;
-import edu.iris.dmc.fdsn.station.model.Station;
 import edu.iris.dmc.seed.Blockette;
 import edu.iris.dmc.seed.Volume;
-import edu.iris.dmc.station.mapper.SeedStringBuilder;
 
 public class Blockettes40sToXmlTest {
 

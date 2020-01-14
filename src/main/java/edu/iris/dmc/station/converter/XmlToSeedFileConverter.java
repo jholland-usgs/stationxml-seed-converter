@@ -56,7 +56,6 @@ import edu.iris.dmc.station.mapper.ChannelBlocketteMapper;
 import edu.iris.dmc.station.mapper.CoefficientsMapper;
 import edu.iris.dmc.station.mapper.DecimationMapper;
 import edu.iris.dmc.station.mapper.FirToBlocketteMapper;
-import edu.iris.dmc.station.mapper.InstrumentSensitivityToBlocketteMapper;
 import edu.iris.dmc.station.mapper.MetadataConverterException;
 import edu.iris.dmc.station.mapper.PolesZerosMapper;
 import edu.iris.dmc.station.mapper.PolynomialMapper;
@@ -81,8 +80,19 @@ public class XmlToSeedFileConverter implements MetadataFileFormatConverter<File>
 		B010 b010 = new B010();
 		b010.setVolumeTime(BTime.now());
 		b010.setOrganization("IRIC DMC");
-		b010.setVersion("02.4");
 		b010.setLabel("Converted from XML");
+		if (args != null) {
+			String org = args.get("organization");
+			if (org != null) {
+				b010.setOrganization(org);
+			}
+			String label = args.get("label");
+			if (org != null) {
+				b010.setLabel(label);
+			}
+		}
+		b010.setVersion("02.4");
+
 		DictionaryIndex dictionary = new DictionaryIndex();
 		logger.log(Level.FINER, "Writing temperoray station file...");
 
@@ -402,7 +412,7 @@ public class XmlToSeedFileConverter implements MetadataFileFormatConverter<File>
 		if (args != null) {
 			String large = args.get("large");
 			if (large != null && Boolean.valueOf(large)) {
-				this.convertLarge(source, target, null);
+				this.convertLarge(source, target, args);
 				return;
 			}
 		}
@@ -411,12 +421,22 @@ public class XmlToSeedFileConverter implements MetadataFileFormatConverter<File>
 		try {
 			document = IrisUtil.readXml(source);
 			volume = XmlToSeedDocumentConverter.getInstance().convert(document);
-			// volume.build();
 		} catch (JAXBException e) {
 			throw new IOException(e);
 		}
 
-		int logicalrecordLength = (int) Math.pow(2, volume.getB010().getNthPower());
+		B010 b010 = volume.getB010();
+		if (args != null) {
+			String org = args.get("organization");
+			if (org != null) {
+				b010.setOrganization(org);
+			}
+			String label = args.get("label");
+			if (org != null) {
+				b010.setLabel(label);
+			}
+		}
+		int logicalrecordLength = (int) Math.pow(2, b010.getNthPower());
 		try (SeedFileWriter writer = new SeedFileWriter(target, logicalrecordLength)) {
 			writer.write(volume);
 		}
@@ -433,8 +453,7 @@ public class XmlToSeedFileConverter implements MetadataFileFormatConverter<File>
 				volume.add(b);
 			}
 		} catch (SeedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new IOException(e);
 		}
 		int logicalrecordLength = (int) Math.pow(2, volume.getB010().getNthPower());
 
