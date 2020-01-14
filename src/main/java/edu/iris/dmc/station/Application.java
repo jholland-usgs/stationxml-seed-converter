@@ -35,6 +35,7 @@ import edu.iris.dmc.station.converter.MetadataFileFormatConverter;
 import edu.iris.dmc.station.converter.SeedToXmlFileConverter;
 import edu.iris.dmc.station.converter.XmlToSeedFileConverter;
 import picocli.CommandLine;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Model.CommandSpec;
@@ -43,6 +44,7 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParseResult;
 import picocli.CommandLine.Spec;
 
+@Command(versionProvider = Application.ManifestVersionProvider.class)
 public class Application implements Callable<Integer> {
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
