@@ -49,8 +49,6 @@ public class Application implements Callable<Integer> {
 
 	private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
-	private boolean debug;
-
 	@Spec
 	private CommandSpec spec;
 
@@ -81,13 +79,18 @@ public class Application implements Callable<Integer> {
 
 	@Option(names = { "-o", "--output" }, description = "Output file or directory, default is System.out")
 	public void setTarget(File target) {
-		if (target.isDirectory() && !target.exists()) {
-			try {
-				target.createNewFile();
-			} catch (IOException e) {
-				throw new ParameterException(spec.commandLine(),
-						"A problem occurred while creating the output file. Details: " + e.toString());
+		try {
+			if (!target.exists()) {
+				if (!target.createNewFile()) {
+					throw new ParameterException(spec.commandLine(),
+							"A problem occurred while creating the output file.");
+				}
 			}
+			
+			this.target = target;
+		} catch (IOException e) {
+			throw new ParameterException(spec.commandLine(),
+					"A problem occurred while creating the output file. Details: " + e.toString());
 		}
 	}
 
@@ -107,33 +110,34 @@ public class Application implements Callable<Integer> {
 	@Override
 	public Integer call() {
 		Level l = Level.toLevel(Integer.MAX_VALUE, Level.OFF);
-		if (verbose != null) {
-			switch (verbose.length) {
-			case 1:
-				l = Level.ERROR;
-				break;
-			case 2:
-				l = Level.WARN;
-				break;
-			case 3:
-				l = Level.INFO;
-				break;
-			case 4:
-				l = Level.DEBUG;
-				break;
-			default:
-				l = Level.OFF;
-			}
-		}
 		ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
 				.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
 		root.setLevel(l);
+		if (verbose != null) {
+			if (verbose.length == 0) {
+				l = Level.OFF;
+			} else {
+				if (verbose.length == 1) {
+					l = Level.ERROR;
+				} else if (verbose.length == 2) {
+					l = Level.WARN;
+				}
+				if (verbose.length == 3) {
+					l = Level.INFO;
+				} else {
+					l = Level.DEBUG;
+				}
+				root.setLevel(l);
+				logger.info("Setting logging level to {}", l);
+			}
+		}
+
 		try {
 			Map<String, String> config = new HashMap<>();
-			if(organization!=null) {
+			if (organization != null) {
 				config.put("organization", organization);
 			}
-			if(label!=null) {
+			if (label != null) {
 				config.put("label", label);
 			}
 			convert(source, target, config);
@@ -145,15 +149,16 @@ public class Application implements Callable<Integer> {
 
 	private void convert(List<File> list, File target, Map<String, String> config) throws Exception {
 		for (File source : list) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Converting {} -> {}",source.getAbsolutePath(),target.getAbsolutePath());
+			if (logger.isDebugEnabled()) {
+				logger.debug("Converting {} -> {}", source.getAbsolutePath(),
+						target != null ? target.getAbsolutePath() : "");
 			}
 			convert(source, target, config);
 		}
 	}
 
 	private void convert(File source, File target, Map<String, String> config) throws Exception {
-		if (source == null || !source.isFile() || source.isHidden()) {
+		if (source == null || source.isHidden()) {
 			throw new IOException("Couldn't process file " + source);
 		}
 
@@ -166,6 +171,10 @@ public class Application implements Callable<Integer> {
 			if (source.length() == 0) {
 				throw new IOException("Couldn't process empty file " + source);
 			}
+			if (logger.isInfoEnabled()) {
+				logger.info("Converting {} -> {}", source.getAbsolutePath(),
+						target != null ? target.getAbsolutePath() : "");
+			}
 			MetadataFileFormatConverter<File> converter = null;
 			String extension = null;
 			if (source.getName().toLowerCase().endsWith("xml")) {
@@ -176,14 +185,14 @@ public class Application implements Callable<Integer> {
 				extension = "xml";
 			}
 			if (target == null) {
-				target = new File(source.getPath() + ".converted." + extension);
+				
 			} else {
 				if (target.isDirectory()) {
 					target = new File(target.getPath() + "/" + source.getName() + ".converted." + extension);
 				}
 			}
 			try {
-				if (debug) {
+				if (logger.isDebugEnabled()) {
 					logger.debug("{} -> {}", source.getName(), target.getName());
 				}
 				converter.convert(source, target, config);
